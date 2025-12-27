@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ConnectionStrings__Default=Server=sql,1433;Database=${Project};User Id=sa;Password=$${Rakesh&database26};TrustServerCertificate=True;
+      - Jwt__Key=$${ThisIsMySuperSecretKey1234567890!}
+      - Jwt__Issuer=$${http://localhost:5183}
+      - Jwt__Audience=$${http://localhost:5183}
+      - Stripe__SecretKey=$${sk_test_REPLACE}
+      - Stripe__WebhookSecret=$${whsec_REPLACE}
+      - Admin__Email=$${admin@examportal.local}
+      - Admin__Password=$${Admin@12345}
+    depends_on:
+      sql:
+        condition: service_healthy
+
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=$${Rakesh&database26}
+    ports:
+      - "14333:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $${Rakesh&database26} -Q \"SELECT 1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sql_data:
