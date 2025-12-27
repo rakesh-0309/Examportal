@@ -108,7 +108,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+
+
 var app = builder.Build();
+builder.WebHost.UseUrls(
+    $"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}"
+);
+
 
 app.UseCors("Frontend");
 app.UseHttpsRedirection();
@@ -135,6 +142,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapGet("/", () => "ExamPortal API is running...");
 
 app.Run();
 
